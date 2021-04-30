@@ -14,7 +14,8 @@ from urllib import request
 import schedule
 import json
 from src.database import DataBase
-
+from dotenv import load_dotenv
+load_dotenv()
 
 def rand(n):
     return ''.join(random.choices(string.ascii_letters + string.digits, k=n))
