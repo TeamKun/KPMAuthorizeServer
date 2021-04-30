@@ -1,3 +1,4 @@
+import json
 import os
 import random
 import socket
@@ -11,11 +12,14 @@ from http.cookies import SimpleCookie
 from http.server import BaseHTTPRequestHandler
 from socketserver import ThreadingTCPServer
 from urllib import request
+
 import schedule
-import json
-from src.database import DataBase
 from dotenv import load_dotenv
+
+from src.database import DataBase
+
 load_dotenv()
+
 
 def rand(n):
     return ''.join(random.choices(string.ascii_letters + string.digits, k=n))
@@ -180,10 +184,10 @@ class Handler(BaseHTTPRequestHandler):
 
                     code = randDig(TOKEN_LENGTH)
                     sql.execute("INSERT INTO CODE VALUES (?, ?, ?, ?, ?)", (code,
-                                                                         clientId,
-                                                                         body["access_token"],
-                                                                         sessionId,
-                                                                         time.time()))
+                                                                            clientId,
+                                                                            body["access_token"],
+                                                                            sessionId,
+                                                                            time.time()))
 
                     write(self, 200, text("/success.html", [
                         ["CODE", str(code)],

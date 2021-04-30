@@ -1,5 +1,5 @@
 import mysql.connector
-import sqlite3
+
 
 def genQuery(table, data=[]):
     query = "SELECT * FROM " + table + " "
