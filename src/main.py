@@ -12,6 +12,7 @@ from http.cookies import SimpleCookie
 from http.server import BaseHTTPRequestHandler
 from socketserver import ThreadingTCPServer
 from urllib import request
+import ssl
 
 import schedule
 from dotenv import load_dotenv
@@ -19,6 +20,7 @@ from dotenv import load_dotenv
 from src.database import DataBase
 
 load_dotenv()
+
 
 
 def rand(n):
@@ -107,6 +109,10 @@ class Handler(BaseHTTPRequestHandler):
         try:
             path = parse.urlparse(self.path)
             params = parse.parse_qs(path.query)
+
+            if path.path == "/":
+                error(self, 403, "Permission denied", "権限がありません。")
+                return
 
             if path.path == "/login/gentoken":
                 if "client_id" not in params:
@@ -246,8 +252,11 @@ def thread():
 
 
 if __name__ == "__main__":
+    os.system("openssl req -nodes -x509 -newkey rsa:4096 -keyout server.pem -out cert.pem -days 365 -subj /C=JP/ST=Tokyo/O=KUNLab/CN=Peyang")
     server = Server(("", PORT), Handler)
     schedule.every(5).seconds.do(watchdog)
     t = threading.Thread(target=thread)
     t.start()
+    server.socket = ssl.wrap_socket(server.socket, certfile=os.getenv("HTTPS_CERT"), keyfile=os.getenv("HTTPS_PEM"), server_side=True)
+    print("server has started")
     server.serve_forever()
